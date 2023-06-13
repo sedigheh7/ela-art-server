@@ -8,8 +8,9 @@ async function getProductById(pProductId){
     return await Product.findByPk(pProductId); 
 }
 
-async function createProduct({name, size, description, price, image}){
-    await Product.create({name, size, description, price, image}); 
+async function createProduct({code, size, description, price, image}){
+
+    await Product.create({code, size, description, price, image}); 
 }
 
 async function changeProductInfo(pProductId, {name, size, description, price, image}){

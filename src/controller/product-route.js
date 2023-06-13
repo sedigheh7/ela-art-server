@@ -2,7 +2,7 @@ import express from 'express';
 import productRepository from "../repository/product-repository.js";
 import multer from 'multer';
 import { send } from 'process';
-import {addProductImag} from '../service/product.service.js'
+import {addProductImage} from '../service/product.service.js'
 
 const router = express.Router();
 
@@ -12,8 +12,9 @@ router.post('/', upload.single('productImage'), async (req, res) => {
     try {
       const { code, size, description, price } = req.body;
       const productImage = req.file;
+      console.log(code, "code")
   
-      const product = await addProductImag(code, size, description, price, req.file, productImage);
+      const product = await addProductImage(code, size, description, price,  productImage);
       res.status(201).json(product);
     } catch (err) {
       console.error(err);

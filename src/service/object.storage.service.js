@@ -8,6 +8,7 @@ const s3 = new AWS.S3({
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
   endpoint: spacesEndpoint,
 });
+
 const uploadFile = (fileStream, fileName, bucketName) => {
   const params = {
     Bucket: bucketName,
@@ -21,6 +22,6 @@ const downloadFile = (fileName, bucketName) => {
     Bucket: bucketName,
     Key: fileName,
   };
-  return s3.get0bject(params).createReadStream();
+  return s3.getObject(params).createReadStream();
 };
 export { uploadFile, downloadFile };

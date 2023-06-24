@@ -3,7 +3,7 @@ import "./config/Database.js";
 import customerRoute from "./controller/customer-route.js";
 import productRoute from "./controller/product-route.js";
 import shippingAddressRoute from "./controller/shippingAddress-route.js"
-import stripeRoute from "./service/stripe.service.js"
+import stripeRoute from "./controller/stripe.route.js"
 
 import cors from "cors";
 import morgan from "morgan";
@@ -20,7 +20,7 @@ app.use(morgan("tiny"));
 app.use(errorHandler);
 app.use("/api/v1/customers", customerRoute);
 app.use("/api/v1/products", productRoute);
-app.use("/api/v1/shippingAddress" , shippingAddressRoute);
-app.use ("/api/v1/stipePayment" ,stripeRoute )
+app.use("/api/v1/shippingAddress", shippingAddressRoute);
+app.use("/api/v1/stripePayment", stripeRoute )
 
 export default app;

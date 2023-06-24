@@ -1,39 +1,30 @@
-import ShippingAddress from "../model/shippingAddress-model.js";
-
-async function getAllShippingAddresses(){
-    return await Product.findAll(); 
-}
-
-// async function getshippingAddressByCustomerId(pProductId){
-//     return await Product.findByPk(pProductId); 
-// }
-
-async function createShippingAddress({ addressLine1, addressLine2, city, state, postalCode, country}){
-
-    await Product.create({addressLine1, addressLine2, city, state, postalCode, country}); 
-}
-
-async function changeShippingAddressInfo(pShippingAddressId, {addressLine1, addressLine2, city, state, postalCode, country}){
-    await Product.update({addressLine1, addressLine2, city, state, postalCode, country}, {
-            where: {
-                id: pShippingAddressId
-            }
-       });       
-}
-
-async function deleteShippingAddressById(pShippingAddressId){
-    await Product.destroy({
-        where: {
-          id: pShippingAddressId
-        }
-       }); 
-}
+import ShippingAddress from '../model/shippingAddress-model.js';
+import Customer from '../model/customer-model.js';
 
 
-export default {
+// Update shipping address
+export const updateShippingAddress = async (req, res) => {
+  try {
+    const { customerId, addressId } = req.params;
+    const customer = await Customer.findByPk(customerId);
 
-    createShippingAddress,
-    changeShippingAddressInfo,
-    deleteShippingAddressById,
-    getAllShippingAddresses,
-}
+    if (!customer) {
+      return res.status(404).json({ error: 'Customer not found' });
+    }
+
+    const shippingAddress = await ShippingAddress.findOne({
+      where: { id: addressId, customerId },
+    });
+
+    if (!shippingAddress) {
+      return res.status(404).json({ error: 'Shipping address not found' });
+    }
+
+    await shippingAddress.update(req.body);
+
+    return res.status(200).json(shippingAddress);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};

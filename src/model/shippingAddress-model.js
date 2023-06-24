@@ -1,11 +1,20 @@
 import sequelize from '../config/connection.js';
-import { DataTypes }  from 'sequelize';  
+import { DataTypes }  from 'sequelize'; 
+
 
 const ShippingAddress = sequelize.define('ShippingAddress', {
     id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
       primaryKey: true,
+    },
+     firstName: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    lastName: {
+      type: DataTypes.STRING,
+      allowNull: false,
     },
     addressLine1: {
       type: DataTypes.STRING,

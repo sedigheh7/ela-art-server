@@ -1,4 +1,6 @@
 import Customer from "../model/customer-model.js";
+import ShippingAddress from "../model/shippingAddress-model.js";
+import CartItem from "../model/cart-model.js";
 import nodemailer from "nodemailer";
 import * as dotenv from "dotenv";
 dotenv.config();
@@ -136,6 +138,144 @@ const contactUsSendEmail = async (pUserData) => {
     res.status(500).json({ message: "Error sending email" });
   }
 };
+
+//creat customers shipping Address
+const createShippingAddress = async (customerId, shippingAddressData) => {
+  try {
+    const customer = await Customer.findByPk(customerId);
+
+    if (!customer) {
+      throw new Error("Customer not found");
+    }
+
+    const shippingAddress = await ShippingAddress.create(shippingAddressData);
+
+    await customer.setShippingAddress(shippingAddress);
+
+    return shippingAddress;
+  } catch (error) {
+    throw new Error("Error while creating a shipping address");
+  }
+};
+
+//customer creat cart
+const createCartItem = async (customerId, cartItemData) => {
+  try {
+    const customer = await Customer.findByPk(customerId);
+
+    if (!customer) {
+      throw new Error('Customer not found');
+    }
+
+    const cartItem = await CartItem.create({
+      productId: cartItemData.productId,
+      quantity: cartItemData.quantity,
+      amount: cartItemData.amount,
+    });
+    await customer.addCartItem(cartItem)
+    return cartItem;
+  } catch (error) {
+    throw new Error('Error while creating a cart item');
+  }
+};
+
+const getCartItems = async (customerId) => {
+  try {
+    const customer = await Customer.findByPk(customerId);
+
+    if (!customer) {
+      throw new Error('Customer not found');
+    }
+
+    return await customer.getCartItems();
+  } catch (error) {
+    throw new Error('Error while creating a cart item');
+  }
+};
+
+//update cart item
+const updateCartItem = async (customerId, cartItemId, cartItemData) => {
+  try {
+    const customer = await Customer.findByPk(customerId);
+
+    if (!customer) {
+      throw new Error('Customer not found');
+    }
+
+    const cartItem = await CartItem.findOne({
+      where: {
+        id: cartItemId,
+        customerId: customer.id,
+      },
+    });
+
+    if (!cartItem) {
+      throw new Error('Cart item not found');
+    }
+
+    await cartItem.update({
+      productId: cartItemData.productId,
+      quantity: cartItemData.quantity,
+      amount: cartItemData.amount,
+    });
+
+    return cartItem;
+  } catch (error) {
+    throw new Error('Error while updating the cart item');
+  }
+};
+//delete cart item
+const deleteCartItem = async (customerId, cartItemId) => {
+  try {
+    const customer = await Customer.findByPk(customerId);
+
+    if (!customer) {
+      throw new Error('Customer not found');
+    }
+
+    const cartItem = await CartItem.findOne({
+      where: {
+        id: cartItemId,
+        customerId: customer.id,
+      },
+    });
+
+    if (!cartItem) {
+      throw new Error('Cart item not found');
+    }
+
+    await cartItem.destroy();
+
+    return;
+  } catch (error) {
+    throw new Error('Error while deleting the cart item');
+  }
+};
+// clear all cart items 
+const clearCart = async (customerId) => {
+  try {
+    const customer = await Customer.findByPk(customerId);
+
+    if (!customer) {
+      throw new Error('Customer not found');
+    }
+
+    await CartItem.destroy({
+      where: {
+        customerId: customer.id,
+      },
+    });
+
+    return;
+  } catch (error) {
+    throw new Error('Error while clearing the cart');
+  }
+};
+
+
+
+
+
 export default {
   getAllCustomer,
   getCustomerByEmail,
@@ -143,5 +283,11 @@ export default {
   changeCustomerInfo,
   deleteCustomer,
   contactUsSendEmail,
-  getUserProfile
+  getUserProfile,
+  createShippingAddress,
+  createCartItem,
+  getCartItems,
+  updateCartItem,
+  deleteCartItem,
+  clearCart
 };

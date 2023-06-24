@@ -1,11 +1,13 @@
 import sequelize from "./connection.js";
 import Customer from "../model/customer-model.js";
 import Product from "../model/product-model.js";
+import CartItem from "../model/cart-model.js";
 import ShippingAddress from "../model/shippingAddress-model.js"
 
 Customer.hasMany(Product,{foreignKey: 'customerId'});
 Product.belongsTo(Customer,{foreignKey: 'customerId'});
 Customer.hasOne(ShippingAddress, {foreignKey: 'customerId'});
+Customer.hasMany(CartItem, {foreignKey: 'customerId'})
 
 const connectToDatabase = async () => {
     try {

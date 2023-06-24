@@ -75,5 +75,91 @@ router.delete('/:id', async (req, res, next) => {
         return next({status: 500, message: error})
     }
   });
+
+  // Create shipping address
+  router.post("/customersShippingAddress/:customerId", async (req, res, next) => {
+    try {
+      const { customerId } = req.params;
+      const result = await customerRepository.createShippingAddress(
+        customerId,
+        req.body
+      );
+      return res.status(201).json(result);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  });
+  //create customer cart
+  router.post("/customer-cart/:customerId", async (req, res, next) => {
+    try {
+      const { customerId } = req.params;
+      const { productId, quantity, amount } = req.body;
+
+      const cartItem = await customerRepository.createCartItem(customerId, {
+        productId,
+        quantity,
+        amount,
+      })
+      return res.status(201).json(cartItem);
+    } catch (error) {
+      console.error(error);
+    return res.status(500).json({ error: 'Internal server error' });
+    }
+  })
+
+  router.get("/customer-cart/:customerId", async (req, res, next) => {
+    try {
+      const { customerId } = req.params;
+
+      const cartItems = await customerRepository.getCartItems(customerId)
+      return res.status(201).json(cartItems);
+    } catch (error) {
+      console.error(error);
+    return res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+// update customer cart items
+  router.put("/customer-cart/:customerId/:cartItemId", async (req, res, next) => {
+    try {
+      const { customerId, cartItemId } = req.params;
+      const { productId, quantity, amount } = req.body;
+  
+      const updatedCartItem = await customerRepository.updateCartItem(customerId, cartItemId, {
+        productId,
+        quantity,
+        amount,
+      });
+      return res.status(200).json(updatedCartItem);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+  // deletecustomer cart item
+  router.delete("/customer-cart/:customerId/:cartItemId", async (req, res, next) => {
+    try {
+      const { customerId, cartItemId } = req.params;
+  
+      await customerRepository.deleteCartItem(customerId, cartItemId);
+      return res.status(200).json({ message: 'Cart item deleted successfully' });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+  
+  router.delete("/customer-cart/:customerId", async (req, res, next) => {
+    try {
+      const { customerId } = req.params;
+  
+      await customerRepository.clearCart(customerId);
+      return res.status(200).json({ message: 'Cart cleared successfully' });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
   export default router
   

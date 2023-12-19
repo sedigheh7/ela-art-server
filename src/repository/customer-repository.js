@@ -158,6 +158,30 @@ const createShippingAddress = async (customerId, shippingAddressData) => {
   }
 };
 
+// Update customer's shipping address
+const updateShippingAddress = async (customerId, shippingAddressData) => {
+  try {
+    const customer = await Customer.findByPk(customerId);
+
+    if (!customer) {
+      throw new Error("Customer not found");
+    }
+
+    const shippingAddress = await ShippingAddress.findOne({
+      where: { id: customer.ShippingAddressId }
+    });
+
+    if (!shippingAddress) {
+      throw new Error("Shipping address not found");
+    }
+
+    await shippingAddress.update(shippingAddressData);
+
+    return shippingAddress;
+  } catch (error) {
+    throw new Error("Error while updating the shipping address");
+  }
+};
 //customer creat cart
 const createCartItem = async (customerId, cartItemData) => {
   try {
@@ -251,6 +275,39 @@ const deleteCartItem = async (customerId, cartItemId) => {
     throw new Error('Error while deleting the cart item');
   }
 };
+
+const hasCardItemWithProduct = async (customerId, productId)=>{
+
+  const cartItem = await CartItem.findOne({
+    where: {
+      productId: productId,
+      customerId: customerId,
+    },
+  });
+
+  return cartItem;
+}
+
+const deleteProductFromCard = async (customerId, productId)=>{
+  try {
+    const customer = await Customer.findByPk(customerId);
+
+    if (!customer) {
+      throw new Error('Customer not found');
+    }
+
+    await CartItem.destroy({
+      where: {
+        productId: productId,
+        customerId: customer.id,
+      },
+    });
+
+  } catch (error) {
+    throw new Error('Error while deleting the cart item');
+  }
+}
+
 // clear all cart items 
 const clearCart = async (customerId) => {
   try {
@@ -285,9 +342,12 @@ export default {
   contactUsSendEmail,
   getUserProfile,
   createShippingAddress,
+  updateShippingAddress,
   createCartItem,
   getCartItems,
   updateCartItem,
   deleteCartItem,
+  hasCardItemWithProduct,
+  deleteProductFromCard,
   clearCart
 };
